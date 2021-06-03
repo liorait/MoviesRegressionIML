@@ -197,6 +197,12 @@ def belongs_to_collection(data):
 
 
 def release_date(data):
+    """
+    preprocess the feature release_date by years
+    keeping all movies that were release before the last year
+    :param data: movies data frame
+    :return: edited data frame
+    """
     data['release_date'] = pd.DatetimeIndex(data['release_date']).year
     curr_year = date.today().year
     data = data.drop(data[data.release_date > curr_year - 1].index)
@@ -271,9 +277,3 @@ def process_begin(data):
     # Add intercept vector
     data.insert(loc=0, column="new_one", value=[1] * len(data.index))
     return data
-
-
-if __name__ == '__main__':
-    # behatzlacha kapara
-    movies_df = pd.read_csv("movies_dataset.csv")
-    release_date(movies_df)
