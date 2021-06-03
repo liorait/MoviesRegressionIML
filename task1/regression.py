@@ -4,7 +4,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import PolynomialFeatures
-
+import preprocessing
 
 def load_data(pathname):
     """
@@ -18,10 +18,10 @@ def load_data(pathname):
 def preprocess(X):
     """
     PreProcessing the data
-    :param X:
-    :return: X
+    :param X: the original data
+    :return: X the preprocess data
     """
-    return X
+    return preprocessing.process_begin(X)
 
 
 def train_val_test_split(X):
@@ -107,4 +107,5 @@ if __name__ == '__main__':
     # check which regression id better
     linear_error_rate = error_rate(y, LinearRegression().fit(X, y).predict(X))
     polynomial_error_rate = error_rate(y, predict(X, train(X, y)))
+    print(linear_error_rate, polynomial_error_rate)
 
