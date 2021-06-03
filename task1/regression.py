@@ -118,7 +118,26 @@ if __name__ == '__main__':
     w = lin_reg.coef_
     y_hat = lin_reg.predict(X_test)
     linear_error_rate = error_rate(y_test, lin_reg.predict(X_test))
-    plt.plot(list(range(len(y))))
+    print(linear_error_rate)
+    y_hat_revenu = y_hat[:, 0]
+    y_hat_votes = y_hat[:, 1]
+
+    y_test = y_test.to_numpy()
+    y_revenu = y_test[:, 0]
+    y_votes = y_test[:, 1]
+    xx = range(len(y_votes))
+    plt.plot(xx, y_revenu, label='real y', alpha=0.5)
+    plt.plot(xx, y_hat_revenu, label='predict y', alpha=0.5)
+    plt.title("error rate: " + str(linear_error_rate['revenue']))
+    plt.legend()
+    plt.show()
+
+    plt.scatter(xx, y_votes, label='real y', alpha=0.5)
+    plt.scatter(xx, y_hat_votes, label='predict y', alpha=0.5)
+    plt.title("error rate: " + str(linear_error_rate[1]))
+    plt.legend()
+    plt.show()
+
     """
     poly_w = train(X_train, y_train)
     y_hat_poly = predict(X_test, poly_w)
