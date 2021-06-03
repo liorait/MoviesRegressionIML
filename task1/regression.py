@@ -4,6 +4,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import PolynomialFeatures
+import preprocessing
 
 
 def load_data(pathname):
@@ -18,22 +19,35 @@ def load_data(pathname):
 def preprocess(X):
     """
     PreProcessing the data
-    :param X:
-    :return: X
+    :param X: the original data
+    :return: X the preprocess data
     """
-    return X
+    return preprocessing.process_begin(X)
 
 
-def train_val_test_split(X):
+def train_val_test_split(X, y):
     """
     Divides the data into train and test parts - train (70%), validation(10%), test(20%)
-    returns X and a response vector y todo add response vector y2
+    returns X and a response vector y
     :param X: PreProcessed data
     :return: X, y
     """
-    train, test = train_test_split(X, test_size=0.2)
-    train, validation = train_test_split(X, test_size=0.125)
-    return train, validation, test
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    X_train, X_validation, y_train, y_validation = train_test_split(X, y, test_size=0.125, random_state=42)
+    return X_train, X_validation, X_test, y_train, y_validation, y_test
+
+
+def split_X_y(X):
+    """
+    split to X- the PreProcessed data and y- response array with 2 columns
+    (revenue and vote_average)
+    :param X: PreProcessed data
+    :return: X, y
+    """
+    y = pd.DataFrame(X, columns=["revenue", "vote_average"])
+    X = X.drop("revenue", axis=1)
+    X = X.drop("vote_average", axis=1)
+    return X, y
 
 
 def train(X, y):
@@ -90,5 +104,11 @@ def choose_degree(X, y):
 
 if __name__ == '__main__':
     movies_df = load_data("movies_dataset.csv")
-    train, validation, test = train_val_test_split(movies_df)
-    train = preprocess(train)
+    movies_df = preprocess(movies_df)
+    X, y = split_X_y(movies_df)
+    X_train, X_validation, X_test, y_train, y_validation, y_test = train_val_test_split(X, y)
+
+    # check which regression is better
+    linear_error_rate = error_rate(y_test, LinearRegression().fit(X_train, y_train).predict(X_test))
+    polynomial_error_rate = error_rate(y_test, predict(X_test, train(X_train, y_train)))
+    print(linear_error_rate, polynomial_error_rate)
