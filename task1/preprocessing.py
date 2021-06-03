@@ -1,6 +1,7 @@
 import pandas as pd
 import ast
 import json
+from datetime import date
 
 TAGLINE_FEATURE = "tagline"
 TITLE_FEATURE = "title"
@@ -243,45 +244,46 @@ def process_nan(data):
     return data
 
 
+def release_date(data):
+    """
+    preprocess the feature release_date by years
+    keeping all movies that were release before the last year
+    :param data: movies data frame
+    :return: edited data frame
+    """
+    data['release_date'] = pd.DatetimeIndex(data['release_date']).year
+    curr_year = date.today().year
+    data = data.drop(data[data.release_date > curr_year - 1].index)
+    return data
+
+
 def process_begin(data):
     """
     Processes the data
     :param data: A dataframe
     :return:
     """
-    # processed_data = copy.deepcopy (data)
-
     # remove columns
-    remove_features = ["id", "homepage", "original_title",
-                       "production_companies", "production_countries", "title", "keywords", "tagline"]
+    remove_features = ["id", "homepage", "original_title", "cast", "crew",
+                       "overview", "spoken_languages", "production_companies",
+                       "production_countries", "title", "keywords", "tagline"]
     for feature in remove_features:
         data = remove(data, feature)
 
-    # remove rows with invalid values
-    data = data[data.runtime != 0]  # keep rows that their runtime is not 0
-    data = data[data.runtime != ""]  # keep rows that their runtime is not None
-    data = data[data.status == RELEASED]  # keep rows that their status is released
-    data = data[data.crew != ""]  # keep rows that their crew is not None
-    data = data[len(data.crew) == 0]  # keep rows that their crew is empty
-
-    for line in data:
-        pass
-
+    data = genre(data)
     data = belongs_to_collection(data)
     data = original_language(data)
-    data = genre(data)
-    data = crew_cast_process(data)
+    data = release_date(data)
 
     # remove rows with invalid values
-    data = data.drop(data[data.runtime == 0].index)  # keep rows that their runtime is not 0
-    data = data.drop(data[data.runtime == ""].index)  # keep rows that their runtime is not None
-    data = data.drop(data[data.status != RELEASED].index)  # keep rows that their status is released
+    data.drop(data[data.status != RELEASED].index)  # keep rows that their status is released
+    data.drop(data[data.runtime <= 0].index, inplace=True)  # keep rows that their runtime is not 0
     data.dropna(subset=["revenue"], inplace=True)  # keep rows that their status is released
     data.dropna(subset=["vote_count"], inplace=True)  # keep rows that their status is released
+
     data = remove(data, "status")
     data = process_nan(data)
 
     # Add intercept vector
     data.insert(loc=0, column="new_one", value=[1] * len(data.index))
-
     return data
