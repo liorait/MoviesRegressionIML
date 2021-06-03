@@ -41,22 +41,29 @@ def remove(data, feature):
     return data
 
 
-def add_value_to_cast(cast_data, revenue):
+def add_value_to_cast(cast_data, revenue, vote_average):
+    """
+    Creates actor dict
+    :param cast_data: cell in cast column
+    :param revenue: the revenue of the current row
+    :param vote_average:
+    :return:
+    """
     for actor in cast_data:
-
+        actor = json.load(actor)
         actor_id_num = actor[id]
         if actor_id_num in cast_dict:
-            cast_dict[actor_id_num].append(revenue)
+            cast_dict[actor_id_num].append((revenue, vote_average))
         else:
-            cast_dict[actor_id_num] = [revenue]
+            cast_dict[actor_id_num] = [(revenue, vote_average)]
 
 
 # Creates producer_dict,
 def add_value_to_crew(crew_data, revenue, vote_average):
     """
     Creates producer_dict, writer_dict, director_dict
-    :param crew_data: row in crew column
-    :param revenue: the revenue
+    :param crew_data: cell in crew column
+    :param revenue: the revenue of the current row
     :return:
     """
     # for each worker in the row, crates a dict with the worker's data
@@ -65,7 +72,6 @@ def add_value_to_crew(crew_data, revenue, vote_average):
         if worker[DEPARTMENT] == PRODUCER:
             worker_id_num = worker[id]
             if worker_id_num in producer_dict:
-
                 producer_dict[worker_id_num].append((revenue, vote_average))
             else:  # creates a new actor
                 producer_dict[worker_id_num] = [(revenue, vote_average)]
@@ -142,7 +148,6 @@ def calculate_crew_average(crew_data):
     return crew_data
 
 
-
 def genre(data):
     """
     preprocess the feature genres into dummies vectors
@@ -190,6 +195,47 @@ def belongs_to_collection(data):
     return data
 
 
+def crew_cast_process(data):
+    """
+    preprocess data in crew column and in cast column
+    :return:
+    """
+    # todo for each row get the cell in the crew column
+    for row in data:
+
+        revenue = 0# todo the revenue
+        vote_average = 0# todo the vote of the line
+
+        # crew part
+        crew_data = [{}] # todo the cell in crew column
+
+        # create producer_dict, writer_dict, director_dict
+        add_value_to_crew(crew_data, revenue, vote_average)
+
+        # cast part
+        cast_data = [{}] # todo the cell in crew column
+
+        # create dict of cast - for each cast member save revenue & vote average
+        add_value_to_cast(cast_data, revenue, vote_average)
+
+    # for each dict calculate the crew value
+    calculate_crew_value(producer_dict)
+    calculate_crew_value(writer_dict)
+    calculate_crew_value(director_dict)
+    calculate_crew_value(cast_dict)
+
+    for row in data:
+        crew_data = [{}] # todo get the cell
+        cast_data = [{}] # todo the cell in crew column
+        crew_data = calculate_crew_value(crew_data)
+        # todo replace the cell in crew column with the new crew_data
+
+       # cast_data = calculate_cast_value(cast_data)
+        # todo replace the cell in cast column with the new crew_data
+
+    return data
+
+
 def process_begin(data):
     """
     Processes the data
@@ -211,14 +257,13 @@ def process_begin(data):
     data = data[data.crew != ""]  # keep rows that their crew is not None
     data = data[len(data.crew) == 0]  # keep rows that their crew is empty
 
-    # todo convert Json columns to dict and remove empty dict
-
     for line in data:
         pass
 
     data = belongs_to_collection(data)
     data = original_language(data)
     data = genre(data)
+    data = crew_cast_process(data)
 
     # Add intercept vector
     data.insert(loc=0, column="new_one", value=[1] * len(data.index))
