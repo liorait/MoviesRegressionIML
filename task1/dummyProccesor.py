@@ -32,10 +32,7 @@ def belongs_to_collection(data):
 
 
 def do_changes(data):
-    remove_features = ["id", "homepage", "original_title",
-                       "production_companies", "production_countries"]
-    for feature in remove_features:
-        data = remove(data, feature)
+
     data = belongs_to_collection(data)
     data = original_language(data)
     data = genre(data)
