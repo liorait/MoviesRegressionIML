@@ -6,6 +6,7 @@ from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import PolynomialFeatures
 import preprocessing
 
+
 def load_data(pathname):
     """
     Loads the data
@@ -38,12 +39,15 @@ def train_val_test_split(X):
 
 def split_X_y(X):
     """
-    todo split to X- the PreProcessed data and y- response array with 2 columns
+    split to X- the PreProcessed data and y- response array with 2 columns
     (revenue and vote_average)
     :param X: PreProcessed data
     :return: X, y
     """
-    return 1, 2
+    y = X["revenue", "vote_average"]
+    X = X.drop("revenue", axis=1)
+    X = X.drop("vote_average", axis=1)
+    return X, y
 
 
 def train(X, y):
@@ -100,12 +104,11 @@ def choose_degree(X, y):
 
 if __name__ == '__main__':
     movies_df = load_data("movies_dataset.csv")
+    movies_df = preprocess(movies_df)
     train, validation, test = train_val_test_split(movies_df)
-    train = preprocess(train)
     X, y = split_X_y(train)
 
     # check which regression id better
     linear_error_rate = error_rate(y, LinearRegression().fit(X, y).predict(X))
     polynomial_error_rate = error_rate(y, predict(X, train(X, y)))
     print(linear_error_rate, polynomial_error_rate)
-

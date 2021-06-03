@@ -220,4 +220,7 @@ def process_begin(data):
     data = original_language(data)
     data = genre(data)
 
+    # Add intercept vector
+    data.insert(loc=0, column="new_one", value=[1] * len(data.index))
+
     return data
