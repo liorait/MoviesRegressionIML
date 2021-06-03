@@ -32,10 +32,10 @@ def belongs_to_collection(data):
 
 
 def do_changes(data):
-
     data = belongs_to_collection(data)
     data = original_language(data)
     data = genre(data)
+    return data
 
 
 def genre(data):
@@ -56,6 +56,22 @@ def genre(data):
     dummy = pd.get_dummies(data.genres.apply(pd.Series).stack()).sum(level=0)
     data = pd.concat([data, dummy], axis=1)
     data = remove(data, 'genres')
+    return data
+
+
+def cast(data):
+    genre_load = data["cast"].apply(ast.literal_eval)
+    for i in range(len(genre_load)):
+        genre_list = genre_load[i]
+        arr = []
+        for genre_dict in genre_list:
+            if 'name' in genre_dict:
+                arr.append(genre_dict['name'])
+        genre_load[i] = arr
+    data['cast'] = genre_load
+    # dummy = pd.get_dummies(data.genres.apply(pd.Series).stack()).sum(level=0)
+    # data = pd.concat([data, dummy], axis=1)
+    # data = remove(data, 'cast')
     return data
 
 
@@ -124,3 +140,4 @@ def production_countries(data):
 if __name__ == '__main__':
     # behatzlacha kapara
     movies_df = pd.read_csv("movies_dataset.csv")
+    cast(movies_df)
