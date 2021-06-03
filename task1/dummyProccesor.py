@@ -4,6 +4,12 @@ import pandas as pd
 
 
 def remove(data, feature):
+    """
+    remove feature from data
+    :param data: data frame
+    :param feature:
+    :return: the data without the feature
+    """
     data = data.drop([feature], axis=1)
     return data
 
@@ -11,10 +17,15 @@ def remove(data, feature):
 def add_dummy(data, feature):
     dummy = pd.get_dummies(data.feature, prefix=feature)
     data = pd.concat([data, dummy], axis=1)
-    return data
 
 
 def belongs_to_collection(data):
+    """
+    preprocess the feature belongs_to_collection into dummies vectors
+    0 if no collection, 1 if in a collection
+    :param data: movies data frame
+    :return: edited data frame
+    """
     data['belongs_to_collection'] = data['belongs_to_collection'].fillna(0)
     data.loc[data.belongs_to_collection != 0, 'belongs_to_collection'] = 1
     return data
@@ -31,6 +42,11 @@ def do_changes(data):
 
 
 def genre(data):
+    """
+    preprocess the feature genres into dummies vectors
+    :param data: movies data frame
+    :return: edited data frame
+    """
     genre_load = data["genres"].apply(ast.literal_eval)
     for i in range(len(genre_load)):
         genre_list = genre_load[i]
@@ -47,6 +63,11 @@ def genre(data):
 
 
 def original_language(data):
+    """
+    preprocess the feature original_language into dummies vectors
+    :param data: movies data frame
+    :return: edited data frame
+    """
     most_common = ['en', 'fr', 'hi', 'ru', 'es', 'ja']
     data.loc[-data.original_language.isin(most_common), 'original_language'] = 'other'
     dummy = pd.get_dummies(data.original_language, prefix='original_language')
@@ -106,4 +127,3 @@ def production_countries(data):
 if __name__ == '__main__':
     # behatzlacha kapara
     movies_df = pd.read_csv("movies_dataset.csv")
-    production_countries(movies_df)
