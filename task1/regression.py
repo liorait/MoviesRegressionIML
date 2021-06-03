@@ -1,4 +1,6 @@
 import numpy as np
+import pandas as pd
+from sklearn.model_selection import train_test_split
 
 
 def load_data(pathname):
@@ -6,7 +8,8 @@ def load_data(pathname):
     Loads the data
     :return:
     """
-    pass
+    movies_df = pd.read_csv(pathname)
+    return movies_df
 
 
 def preprocess(X):
@@ -15,17 +18,19 @@ def preprocess(X):
     :param X:
     :return: X
     """
-    pass
+    return X
 
 
-def train_val_test(X):
+def train_val_test_split(X):
     """
     Divides the data into train and test parts - train (70%), validation(10%), test(20%)
     returns X and a response vector y todo add response vector y2
     :param X: PreProcessed data
     :return: X, y
     """
-    pass
+    train, test = train_test_split(X, test_size=0.2)
+    train, validation = train_test_split(X, test_size=0.125)
+    return train, validation, test
 
 
 def train(X, y):
@@ -55,4 +60,12 @@ def error_rate(y, y_hat):
     :return: the error rate
     """
     pass
+
+
+if __name__ == '__main__':
+    movies_df = load_data("movies_dataset.csv")
+    train, validation, test = train_val_test_split(movies_df)
+    train = preprocess(train)
+
+
 
