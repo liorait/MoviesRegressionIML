@@ -27,13 +27,23 @@ def preprocess(X):
 def train_val_test_split(X):
     """
     Divides the data into train and test parts - train (70%), validation(10%), test(20%)
-    returns X and a response vector y todo add response vector y2
+    returns X and a response vector y
     :param X: PreProcessed data
     :return: X, y
     """
     train, test = train_test_split(X, test_size=0.2)
     train, validation = train_test_split(X, test_size=0.125)
     return train, validation, test
+
+
+def split_X_y(X):
+    """
+    todo split to X- the PreProcessed data and y- response array with 2 columns
+    (revenue and vote_average)
+    :param X: PreProcessed data
+    :return: X, y
+    """
+    return 1, 2
 
 
 def train(X, y):
@@ -92,3 +102,9 @@ if __name__ == '__main__':
     movies_df = load_data("movies_dataset.csv")
     train, validation, test = train_val_test_split(movies_df)
     train = preprocess(train)
+    X, y = split_X_y(train)
+
+    # check which regression id better
+    linear_error_rate = error_rate(y, LinearRegression().fit(X, y).predict(X))
+    polynomial_error_rate = error_rate(y, predict(X, train(X, y)))
+
