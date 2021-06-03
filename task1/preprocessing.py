@@ -1,6 +1,7 @@
 cast_dict={}
 keyword_dict={}
 crew_dict={}
+KNOWN_FOR=""
 
 # some change
 
