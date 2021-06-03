@@ -86,13 +86,43 @@ def calculate_crew_value(crew_dict):
     return crew_dict
 
 
-
 def calculate_crew_average(crew_data):
     """
-
-    :param crew_data:
-    :return:
+    calculates average between crew roles: writer,producer, director in the following way:
+    gets a value in the crew_data column
+    for each worker that is in producer, writer, director
+    goes to the dict in the relevant worker id
+    gets its rank , calculates the average and saves in the cell
+    :param crew_data: a value in the crew_data column
+    :return: total crew rank
     """
+    rank_of_producer = []
+    rank_of_writer = []
+    rank_of_director = []
+
+    for worker in crew_data:
+        worker = json.load(worker)
+        if worker[DEPARTMENT] == PRODUCER:
+            worker_id_num = worker[id]
+            if worker_id_num in producer_dict:
+                rank_of_producer.append(producer_dict[worker_id_num])  #  adds to the list of producer's rank the rank
+        elif worker[DEPARTMENT] == WRITER:
+            worker_id_num = worker[id]
+            if worker_id_num in writer_dict:
+                rank_of_writer.append(writer_dict[worker_id_num])  #  adds to the list of writer's rank the rank
+        elif worker[DEPARTMENT] == DIRECTOR:
+            worker_id_num = worker[id]
+            if worker_id_num in director_dict:
+                rank_of_director.append(director_dict[worker_id_num])  #  adds to the list of directors's rank the rank
+
+    sum_of_producers_rank = sum(rank_of_producer)
+    sum_of_director_rank = sum(rank_of_director)
+    sum_of_writer_rank = sum(rank_of_writer)
+
+    total_crew_average_rank = (sum_of_producers_rank + sum_of_director_rank + sum_of_writer_rank) / 3
+    crew_data = total_crew_average_rank
+    return crew_data
+
 
 def process_begin(data):
     """
