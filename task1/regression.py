@@ -43,7 +43,7 @@ def train(X, y):
     pass
 
 
-def predict(X):
+def predict(X, w):
     """
     Receives row data, pre-processing the data and predicts the model
     :param X: PreProcessed data
@@ -59,7 +59,7 @@ def error_rate(y, y_hat):
     :param y_hat: the predicted vector
     :return: the error rate
     """
-    pass
+    return np.sqrt(np.mean((y-y_hat)**2))
 
 
 if __name__ == '__main__':
