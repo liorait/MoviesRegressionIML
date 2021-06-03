@@ -25,16 +25,16 @@ def preprocess(X):
     return preprocessing.process_begin(X)
 
 
-def train_val_test_split(X):
+def train_val_test_split(X, y):
     """
     Divides the data into train and test parts - train (70%), validation(10%), test(20%)
     returns X and a response vector y
     :param X: PreProcessed data
     :return: X, y
     """
-    train, test = train_test_split(X, test_size=0.2)
-    train, validation = train_test_split(X, test_size=0.125)
-    return train, validation, test
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    X_train, X_validation, y_train, y_validation = train_test_split(X, y, test_size=0.125, random_state=42)
+    return X_train, X_validation, X_test, y_train, y_validation, y_test
 
 
 def split_X_y(X):
@@ -44,7 +44,7 @@ def split_X_y(X):
     :param X: PreProcessed data
     :return: X, y
     """
-    y = X["revenue", "vote_average"]
+    y = pd.DataFrame(X, columns=["revenue", "vote_average"])
     X = X.drop("revenue", axis=1)
     X = X.drop("vote_average", axis=1)
     return X, y
@@ -105,10 +105,10 @@ def choose_degree(X, y):
 if __name__ == '__main__':
     movies_df = load_data("movies_dataset.csv")
     movies_df = preprocess(movies_df)
-    train, validation, test = train_val_test_split(movies_df)
-    X, y = split_X_y(train)
+    X, y = split_X_y(movies_df)
+    X_train, X_validation, X_test, y_train, y_validation, y_test = train_val_test_split(X, y)
 
-    # check which regression id better
-    linear_error_rate = error_rate(y, LinearRegression().fit(X, y).predict(X))
-    polynomial_error_rate = error_rate(y, predict(X, train(X, y)))
+    # check which regression is better
+    linear_error_rate = error_rate(y_test, LinearRegression().fit(X_train, y_train).predict(X_test))
+    polynomial_error_rate = error_rate(y_test, predict(X_test, train(X_train, y_train)))
     print(linear_error_rate, polynomial_error_rate)
