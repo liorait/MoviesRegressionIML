@@ -63,8 +63,12 @@ def error_rate(y, y_hat):
 
 
 if __name__ == '__main__':
-    movies_df = load_data("movies_dataset.csv")
-    train, validation, test = train_val_test_split(movies_df)
+ #   movies_df = load_data("movies_dataset.csv")
+ #   train, validation, test = train_val_test_split(movies_df)
+
+    train_data = np.load("train.npy", allow_pickle=True)
+    validation = np.load("validation.npy", allow_pickle=True)
+    test = np.load("test.npy", allow_pickle=True)
     train = preprocess(train)
 
 
