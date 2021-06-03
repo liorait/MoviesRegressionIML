@@ -1,6 +1,13 @@
 import copy
-import dummyProccesor
+import dummyProccesor as pro
 import json
+
+TAGLINE_FEATURE ="tagline"
+TITLE_FEATURE = "title"
+KEYWORDS_FEATURE ="keywords"
+RUNTIME_FEATURE ="runtime"
+RELEASED = "Released"
+
 
 cast_dict={}
 keyword_dict={}
@@ -71,6 +78,13 @@ def calculate_crew_value():
 
 def process_begin(data):
     # processed_data = copy.deepcopy (data)
-    # for line in processed_data:
-    pass
+    pro.remove(TAGLINE_FEATURE)
+    pro.remove(TITLE_FEATURE)
+    pro.remove(KEYWORDS_FEATURE)
+    data[data.runtime != 0]
+    data[data.status == RELEASED]
+
+    for line in data:
+        pass
+
 
