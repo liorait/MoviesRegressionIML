@@ -148,6 +148,18 @@ def calculate_crew_average(crew_data):
     return crew_data
 
 
+def calculate_cast_average(cast_data):
+    rank_of_actor = []
+    for actor in cast_data:
+        actor_id_num = actor[id]
+        if actor_id_num in cast_dict:
+            rank_of_actor.append(cast_dict[actor_id_num])  #  adds to the list of actor's rank the rank
+
+    sum_of_actor_rank = sum(rank_of_actor) / len(rank_of_actor)
+    cast_data = sum_of_actor_rank
+    return cast_data
+
+
 def genre(data):
     """
     preprocess the feature genres into dummies vectors
@@ -227,10 +239,10 @@ def crew_cast_process(data):
     for row in data:
         crew_data = [{}] # todo get the cell
         cast_data = [{}] # todo the cell in crew column
-        crew_data = calculate_crew_value(crew_data)
+        crew_data = calculate_crew_average(crew_data)
         # todo replace the cell in crew column with the new crew_data
 
-       # cast_data = calculate_cast_value(cast_data)
+        cast_data = calculate_cast_average(cast_data)
         # todo replace the cell in cast column with the new crew_data
 
     return data
