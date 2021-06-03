@@ -3,18 +3,17 @@ import ast
 import json
 from datetime import date
 
-TAGLINE_FEATURE ="tagline"
+TAGLINE_FEATURE = "tagline"
 TITLE_FEATURE = "title"
-KEYWORDS_FEATURE ="keywords"
-RUNTIME_FEATURE ="runtime"
+KEYWORDS_FEATURE = "keywords"
+RUNTIME_FEATURE = "runtime"
 RELEASED = "Released"
 
-
-cast_dict={}
-keyword_dict={}
-producer_dict={}
-director_dict={}
-writer_dict={}
+cast_dict = {}
+keyword_dict = {}
+producer_dict = {}
+director_dict = {}
+writer_dict = {}
 RUNTIME_FEATURE = "runtime"
 RELEASED = "Released"
 
@@ -130,15 +129,15 @@ def calculate_crew_average(crew_data):
         if worker[DEPARTMENT] == PRODUCER:
             worker_id_num = worker[id]
             if worker_id_num in producer_dict:
-                rank_of_producer.append(producer_dict[worker_id_num])  #  adds to the list of producer's rank the rank
+                rank_of_producer.append(producer_dict[worker_id_num])  # adds to the list of producer's rank the rank
         elif worker[DEPARTMENT] == WRITER:
             worker_id_num = worker[id]
             if worker_id_num in writer_dict:
-                rank_of_writer.append(writer_dict[worker_id_num])  #  adds to the list of writer's rank the rank
+                rank_of_writer.append(writer_dict[worker_id_num])  # adds to the list of writer's rank the rank
         elif worker[DEPARTMENT] == DIRECTOR:
             worker_id_num = worker[id]
             if worker_id_num in director_dict:
-                rank_of_director.append(director_dict[worker_id_num])  #  adds to the list of directors's rank the rank
+                rank_of_director.append(director_dict[worker_id_num])  # adds to the list of directors's rank the rank
 
     sum_of_producers_rank = sum(rank_of_producer)
     sum_of_director_rank = sum(rank_of_director)
@@ -216,18 +215,17 @@ def crew_cast_process(data):
     """
     # todo for each row get the cell in the crew column
     for row in data:
-
-        revenue = 0# todo the revenue
-        vote_average = 0# todo the vote of the line
+        revenue = 0  # todo the revenue
+        vote_average = 0  # todo the vote of the line
 
         # crew part
-        crew_data = [{}] # todo the cell in crew column
+        crew_data = [{}]  # todo the cell in crew column
 
         # create producer_dict, writer_dict, director_dict
         add_value_to_crew(crew_data, revenue, vote_average)
 
         # cast part
-        cast_data = [{}] # todo the cell in crew column
+        cast_data = [{}]  # todo the cell in crew column
 
         # create dict of cast - for each cast member save revenue & vote average
         add_value_to_cast(cast_data, revenue, vote_average)
@@ -239,13 +237,22 @@ def crew_cast_process(data):
     calculate_crew_value(cast_dict)
 
     for row in data:
-        crew_data = [{}] # todo get the cell
-        cast_data = [{}] # todo the cell in crew column
+        crew_data = [{}]  # todo get the cell
+        cast_data = [{}]  # todo the cell in crew column
         crew_data = calculate_crew_value(crew_data)
         # todo replace the cell in crew column with the new crew_data
 
-       # cast_data = calculate_cast_value(cast_data)
-        # todo replace the cell in cast column with the new crew_data
+    # cast_data = calculate_cast_value(cast_data)
+    # todo replace the cell in cast column with the new crew_data
+
+    return data
+
+
+def process_nan(data):
+    features = list(data.columns)
+    for f in features:
+        avrage = data[f].mean()
+        data[f] = data[f].fillna(avrage)
 
     return data
 
@@ -269,11 +276,14 @@ def process_begin(data):
     data = genre(data)
 
     # remove rows with invalid values
-    data = data.drop(data[data.runtime == 0].index) # keep rows that their runtime is not 0
-    data = data.drop(data[data.runtime == ""].index) # keep rows that their runtime is not None
-    data = data.drop(data[data.status != RELEASED].index) # keep rows that their status is released
-
+    data = data.drop(data[data.runtime == 0].index)  # keep rows that their runtime is not 0
+    data = data.drop(data[data.runtime == ""].index)  # keep rows that their runtime is not None
+    data = data.drop(data[data.status != RELEASED].index)  # keep rows that their status is released
+    data.dropna(subset=["revenue"], inplace=True)  # keep rows that their status is released
+    data.dropna(subset=["vote_count"], inplace=True)  # keep rows that their status is released
     data = remove(data, "status")
+    data = process_nan(data)
+
     # Add intercept vector
     data.insert(loc=0, column="new_one", value=[1] * len(data.index))
     return data

@@ -5,6 +5,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import PolynomialFeatures
 import preprocessing
+import matplotlib.pyplot as plt
 
 
 def load_data(pathname):
@@ -94,7 +95,9 @@ def choose_degree(X, y):
     max_accurate = 0
     for i, k in enumerate(ks):
         y_hat = make_pipeline(PolynomialFeatures(k), LinearRegression()).fit(X, y).predict(X)
-        accurate = 1 - error_rate(y, y_hat)
+        error = error_rate(y, y_hat)
+        error /= len(y)
+        accurate = 1 - error
         if accurate > max_accurate:
             max_accurate = accurate
             best_degree = k
@@ -109,6 +112,16 @@ if __name__ == '__main__':
     X_train, X_validation, X_test, y_train, y_validation, y_test = train_val_test_split(X, y)
 
     # check which regression is better
-    linear_error_rate = error_rate(y_test, LinearRegression().fit(X_train, y_train).predict(X_test))
-    polynomial_error_rate = error_rate(y_test, predict(X_test, train(X_train, y_train)))
-    print(linear_error_rate, polynomial_error_rate)
+    y_train = y_train.to_numpy()
+    X_train = X_train.to_numpy()
+    lin_reg = LinearRegression().fit(X_train, y_train)
+    w = lin_reg.coef_
+    y_hat = lin_reg.predict(X_test)
+    linear_error_rate = error_rate(y_test, lin_reg.predict(X_test))
+    plt.plot(list(range(len(y))))
+    """
+    poly_w = train(X_train, y_train)
+    y_hat_poly = predict(X_test, poly_w)
+    poly_error_rate = error_rate(y_test, y_hat_poly)
+    print(poly_error_rate)
+    """
