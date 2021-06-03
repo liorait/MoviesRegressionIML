@@ -1,4 +1,5 @@
 import copy
+import dummyProccesor
 import json
 
 cast_dict={}
@@ -24,28 +25,35 @@ def add_value_to_cast(cast_data, revenue):
         else:
             cast_dict[actor_id_num]=[revenue]
 
+# Creates producer_dict,
 def add_value_to_crew(crew_data, revenue):
+    """
+    Creates producer_dict, writer_dict, director_dict
+    :param crew_data: row in crew column
+    :param revenue: the revenue
+    :return:
+    """
     # for each worker in the row, crates a dict with the worker's data
     for worker in crew_data:
         worker = json.load(worker)
         if worker[DEPARTMENT] == PRODUCER:
-            actor_id_num=worker[id]
-            if actor_id_num in producer_dict:
-                producer_dict[actor_id_num].append(revenue)
-            else: # creates a new actor
-                producer_dict[actor_id_num]=[revenue]
+            worker_id_num=worker[id]
+            if worker_id_num in producer_dict:
+                producer_dict[worker_id_num].append(revenue)
+            else:  # creates a new actor
+                producer_dict[worker_id_num]=[revenue]
         elif worker[DEPARTMENT] == DIRECTOR:
-            actor_id_num=worker[id]
-            if actor_id_num in director_dict:
-                director_dict[actor_id_num].append(revenue)
+            worker_id_num=worker[id]
+            if worker_id_num in director_dict:
+                director_dict[worker_id_num].append(revenue)
             else:
-                director_dict[actor_id_num]=[revenue]
+                director_dict[worker_id_num]=[revenue]
         elif worker[DEPARTMENT] == WRITER:
-            actor_id_num=worker[id]
-            if actor_id_num in writer_dict:
-                writer_dict[actor_id_num].append(revenue)
+            worker_id_num=worker[id]
+            if worker_id_num in writer_dict:
+                writer_dict[worker_id_num].append(revenue)
             else:
-                writer_dict[actor_id_num]=[revenue]
+                writer_dict[worker_id_num]=[revenue]
 
 
 
