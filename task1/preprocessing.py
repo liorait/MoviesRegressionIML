@@ -1,11 +1,22 @@
 import pandas as pd
 import ast
 import json
+import numpy as np
+TAGLINE_FEATURE = "tagline"
 from datetime import date
 import numpy as np
 
 TAGLINE_FEATURE = "tagline"
 TITLE_FEATURE = "title"
+KEYWORDS_FEATURE = "keywords"
+RUNTIME_FEATURE = "runtime"
+RELEASED = "Released"
+
+cast_dict = {}
+keyword_dict = {}
+producer_dict = {}
+director_dict = {}
+writer_dict = {}
 KEYWORDS_FEATURE = "keywords"
 RUNTIME_FEATURE = "runtime"
 RELEASED = "Released"
@@ -520,14 +531,13 @@ def process_begin(data):
                        "production_countries", "title", "keywords", "tagline"]
     for feature in remove_features:
         data = remove(data, feature)
-    # data = crew_process(data)
-    # data = cast_process(data)
+    data = crew_process(data)
+    data = cast_process(data)
 
     data = genre(data)
     data = belongs_to_collection(data)
     data = original_language(data)
     data = release_date(data)
-
 
     # remove rows with invalid values
     data.drop(data[data.status != RELEASED].index)  # keep rows that their status is released
