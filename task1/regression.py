@@ -5,6 +5,8 @@ from sklearn.linear_model import LinearRegression
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import PolynomialFeatures
 import preprocessing
+import matplotlib.pyplot as plt
+import pickle
 
 
 def load_data(pathname):
@@ -25,16 +27,15 @@ def preprocess(X):
     return preprocessing.process_begin(X)
 
 
-def train_val_test_split(X, y):
+def our_train_test_split(X, y):
     """
-    Divides the data into train and test parts - train (70%), validation(10%), test(20%)
+    Divides the data into train and test parts - train (80%), test(20%)
     returns X and a response vector y
     :param X: PreProcessed data
     :return: X, y
     """
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-    X_train, X_validation, y_train, y_validation = train_test_split(X, y, test_size=0.125, random_state=42)
-    return X_train, X_validation, X_test, y_train, y_validation, y_test
+    return X_train, X_test, y_train, y_test
 
 
 def split_X_y(X):
@@ -94,7 +95,9 @@ def choose_degree(X, y):
     max_accurate = 0
     for i, k in enumerate(ks):
         y_hat = make_pipeline(PolynomialFeatures(k), LinearRegression()).fit(X, y).predict(X)
-        accurate = 1 - error_rate(y, y_hat)
+        error = error_rate(y, y_hat)
+        error /= len(y)
+        accurate = 1 - error
         if accurate > max_accurate:
             max_accurate = accurate
             best_degree = k
@@ -106,9 +109,40 @@ if __name__ == '__main__':
     movies_df = load_data("movies_dataset.csv")
     movies_df = preprocess(movies_df)
     X, y = split_X_y(movies_df)
-    X_train, X_validation, X_test, y_train, y_validation, y_test = train_val_test_split(X, y)
+    X_train, X_test, y_train, y_test = our_train_test_split(X, y)
 
     # check which regression is better
-    linear_error_rate = error_rate(y_test, LinearRegression().fit(X_train, y_train).predict(X_test))
-    polynomial_error_rate = error_rate(y_test, predict(X_test, train(X_train, y_train)))
-    print(linear_error_rate, polynomial_error_rate)
+    y_train = y_train.to_numpy()
+    X_train = X_train.to_numpy()
+    lin_reg = LinearRegression().fit(X_train, y_train)
+    w = lin_reg.coef_
+    weights = pickle.dumps(w)
+    lin_reg.coef_ = pickle.loads(weights)
+    y_hat = lin_reg.predict(X_test)
+    linear_error_rate = error_rate(y_test, lin_reg.predict(X_test))
+    print(linear_error_rate)
+    y_hat_revenu = y_hat[:, 0]
+    y_hat_votes = y_hat[:, 1]
+
+    y_test = y_test.to_numpy()
+    y_revenu = y_test[:, 0]
+    y_votes = y_test[:, 1]
+    xx = range(len(y_votes))
+    plt.plot(xx, y_revenu, label='real y', alpha=0.5)
+    plt.plot(xx, y_hat_revenu, label='predict y', alpha=0.5)
+    plt.title("error rate: " + str(linear_error_rate['revenue']))
+    plt.legend()
+    plt.show()
+
+    plt.scatter(xx, y_votes, label='real y', alpha=0.5)
+    plt.scatter(xx, y_hat_votes, label='predict y', alpha=0.5)
+    plt.title("error rate: " + str(linear_error_rate[1]))
+    plt.legend()
+    plt.show()
+
+    """
+    poly_w = train(X_train, y_train)
+    y_hat_poly = predict(X_test, poly_w)
+    poly_error_rate = error_rate(y_test, y_hat_poly)
+    print(poly_error_rate)
+    """
